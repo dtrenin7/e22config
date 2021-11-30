@@ -1,4 +1,4 @@
-rm -rf ./e22config
+rm -rf ./e32config
 clear
-go build -o e22config
-./e22config $@
+go build -o e32config
+./e32config $@
