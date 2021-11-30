@@ -8,4 +8,4 @@ each module support was added as separate branch
 module | branch
 ------------ | -------------
 E22 | main
-E33 | e33
+E32 | e33
