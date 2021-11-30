@@ -50,7 +50,7 @@ var (
   POWER_DBM_24 byte                   = 0x02
   POWER_DBM_21 byte                   = 0x03
 
-  FEC_ENABLE byte                     = 0x02
+  FEC_ENABLE byte                     = 0x04
   FEC_DISABLE byte                    = 0x00
 
   TRANSMISSION_MODE_FIXED byte        = 0x80
@@ -73,7 +73,7 @@ var (
   MASK_UART_PARITY byte               = 0xC0
   MASK_CHANNEL byte                   = 0x1F
   MASK_POWER byte                     = 0x03
-  MASK_FEC byte                       = 0x02
+  MASK_FEC byte                       = 0x04
   MASK_WAKE_UP byte                   = 0x38
   MASK_DRIVE_MODE byte                = 0x40
   MASK_TRANSMISSION_MODE byte         = 0x80
