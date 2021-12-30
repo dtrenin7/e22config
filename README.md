@@ -1,11 +1,12 @@
 # e22config
-LoRa E22/E32 Module Configuration Utility
+EBYTE E22/E31/E32 Module Configuration Utility
 
-Tested with MacOS Catalina, EBYTE E22-400T30D, E32-433T30D LoRa modules
+Tested with MacOS Catalina
 
 each module support was added as separate branch
 
-module | branch
------------- | -------------
-E22 | main
-E32 | e32
+module |chip | branch
+------------ | ------------ | -------------
+E22-400T30D | LoRa SX1268 | main
+E31-433T33D | AX5243 | e31
+E32-433T30D | LoRa SX1278 | e32

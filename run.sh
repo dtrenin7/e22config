@@ -1,4 +1,4 @@
-rm -rf ./e32config
+rm -rf ./e31config
 clear
-go build -o e32config
-./e32config $@
+go build -o e31config
+./e31config $@

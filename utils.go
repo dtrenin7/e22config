@@ -83,6 +83,14 @@ func getInt(value string) int {
 	return i
 }
 
+func getFloat(value string) float64 {
+	i, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return i
+}
+
 func getByte(value string) byte {
 	i, err := strconv.ParseUint(value, 10, 8)
 	if err != nil {
