@@ -634,7 +634,7 @@ func Show(win fyne.Window) fyne.CanvasObject {
 func createGUI() fyne.Window {
 	log.Println("Starting GUI...")
 	a := app.New()
-	w := a.NewWindow("LoRa E22 Module Configuration Utility")
+	w := a.NewWindow("E22-400T30D Module Configuration Utility")
 	w.SetContent(Show(w))
 	w.Resize(fyne.NewSize(width, 200))
 	return w
