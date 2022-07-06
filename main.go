@@ -353,7 +353,7 @@ func NewBTLP() *BTLP {
 					default:
 						Throw("Unknown Power value!")
 					}
-					channel := int((getFloat(boot.selects["Channel"].Text) - float64(425.0)) / float64(10.0))
+					channel := int((getFloat(boot.selects["Channel"].Text) - float64(425.0)) * float64(10.0))
 					if channel < 0 || channel > 255 {
 						Throw("Unknown Channel value!")
 					}
@@ -609,7 +609,7 @@ func Show(win fyne.Window) fyne.CanvasObject {
 func createGUI() fyne.Window {
 	log.Println("Starting GUI...")
 	a := app.New()
-	w := a.NewWindow("AX5243 E31 Module Configuration Utility")
+	w := a.NewWindow("E31-433T33D (AX5243) Module Configuration Utility")
 	w.SetContent(Show(w))
 	w.Resize(fyne.NewSize(width, 200))
 	return w
