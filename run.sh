@@ -1,4 +1,4 @@
-rm -rf ./e22config
+rm -rf ./e22_33config
 clear
-go build -o e22config
-./e22config $@
+go build -o e22_33config
+./e22_33config $@
