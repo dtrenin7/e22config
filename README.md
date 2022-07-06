@@ -1,7 +1,7 @@
 # e22config
 EBYTE E22/E31/E32 Module Configuration Utility
 
-Tested with MacOS Catalina
+Tested with MacOS Catalina, Windows 7
 
 each module support was added as separate branch
 
