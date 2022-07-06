@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 	"encoding/hex"
-	"e22config/LoRa/E31"
+	M "e22config/LoRa/E32_33"
 	"go.bug.st/serial.v1"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -98,14 +98,14 @@ func NewBTLP() *BTLP {
 	b.defaults["WirelessRate"] = "1200"
 	b.defaults["WakeUpTime"] = "250"
 	b.defaults["Power"] = "33"
-	b.defaults["Channel"] = "433.0"
+	b.defaults["Channel"] = "433"
 	b.defaults["TransmissionMode"] = "Transparent"
 	b.defaults["DriveMode"] = "Push/pull"
 	b.defaults["FEC"] = "true"
 
 	b.selectOptions["UARTRate"] = []string{"1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"}
 	b.selectOptions["UARTParityBit"] = []string{"8N1", "8O1", "8E1"}
-	b.selectOptions["WirelessRate"] = []string{"1200", "2400", "4800", "9600", "19200", "38400", "50000", "70000"}
+	b.selectOptions["WirelessRate"] = []string{"300", "1200", "2400", "4800", "9600", "19200", "19200_2", "19200_3"}
 	b.selectOptions["WakeUpTime"] = []string{"250", "500", "750", "1000", "1250", "1500", "1750", "2000"}
 	b.selectOptions["Power"] = []string{"33", "30", "27", "24"}
 	ports, err := serial.GetPortsList()
@@ -117,8 +117,8 @@ func NewBTLP() *BTLP {
 		b.selectOptions["Device"] = []string{"/dev/tty.usbserial-0001"}
 	}
 	data := []string{}
-	for i := float64(0); i < float64(25.6); i += float64(0.1) {
-		data = append(data, fmt.Sprintf("%.1f", float64(i) + float64(425.0)))
+	for i := 0; i < 32; i++ {
+		data = append(data, fmt.Sprintf("%d", i + 410))
 	}
 	b.selectOptions["Channel"] = data
 	b.selectOptions["TransmissionMode"] = []string{"Fixed point", "Transparent"}
@@ -134,117 +134,117 @@ func NewBTLP() *BTLP {
 		    Try: func() {
 					boot.DisableButtons()
 					boot.SetState("Port " + dev + " opened")
-					data, err := Serial.Command(E31.COMMAND_GET_PARAMETERS[:])
+					data, err := Serial.Command(M.COMMAND_GET_PARAMETERS[:])
 					if len(data) == 6 {
 						args := data[:]
 						log.Printf("ARGS: %s", hex.Dump(args))
-						boot.entries["ADDH"].SetText(fmt.Sprintf("%d", args[E31.REGISTER_ADDH[0]]))
-						boot.entries["ADDL"].SetText(fmt.Sprintf("%d", args[E31.REGISTER_ADDL[0]]))
-						switch args[E31.REGISTER_SPED[0]] & E31.MASK_UART_BAUD {
-						case E31.UART_BAUD_1200:
+						boot.entries["ADDH"].SetText(fmt.Sprintf("%d", args[M.REGISTER_ADDH[0]]))
+						boot.entries["ADDL"].SetText(fmt.Sprintf("%d", args[M.REGISTER_ADDL[0]]))
+						switch args[M.REGISTER_SPED[0]] & M.MASK_UART_BAUD {
+						case M.UART_BAUD_1200:
 							boot.selects["UARTRate"].SetText("1200")
-						case E31.UART_BAUD_2400:
+						case M.UART_BAUD_2400:
 							boot.selects["UARTRate"].SetText("2400")
-						case E31.UART_BAUD_4800:
+						case M.UART_BAUD_4800:
 							boot.selects["UARTRate"].SetText("4800")
-						case E31.UART_BAUD_9600:
+						case M.UART_BAUD_9600:
 							boot.selects["UARTRate"].SetText("9600")
-						case E31.UART_BAUD_19200:
+						case M.UART_BAUD_19200:
 							boot.selects["UARTRate"].SetText("19200")
-						case E31.UART_BAUD_38400:
+						case M.UART_BAUD_38400:
 							boot.selects["UARTRate"].SetText("38400")
-						case E31.UART_BAUD_57600:
+						case M.UART_BAUD_57600:
 							boot.selects["UARTRate"].SetText("57600")
-						case E31.UART_BAUD_115200:
+						case M.UART_BAUD_115200:
 							boot.selects["UARTRate"].SetText("115200")
 						default:
 							Throw("Unknown UARTRate value!")
 						}
-						switch args[E31.REGISTER_SPED[0]] & E31.MASK_UART_PARITY {
-						case E31.UART_8N1:
-						case E31.UART_8N1_2:
+						switch args[M.REGISTER_SPED[0]] & M.MASK_UART_PARITY {
+						case M.UART_8N1:
+						case M.UART_8N1_2:
 							boot.selects["UARTParityBit"].SetText("8N1")
-						case E31.UART_8O1:
+						case M.UART_8O1:
 							boot.selects["UARTParityBit"].SetText("8O1")
-						case E31.UART_8E1:
+						case M.UART_8E1:
 							boot.selects["UARTParityBit"].SetText("8E1")
 						default:
 							Throw("Unknown UARTParityBit value!")
 						}
-						switch args[E31.REGISTER_SPED[0]] & E31.MASK_AIR_BAUD {
-						case E31.AIR_BAUD_1200:
+						switch args[M.REGISTER_SPED[0]] & M.MASK_AIR_BAUD {
+						case M.AIR_BAUD_300:
+							boot.selects["WirelessRate"].SetText("300")
+						case M.AIR_BAUD_1200:
 							boot.selects["WirelessRate"].SetText("1200")
-						case E31.AIR_BAUD_2400:
+						case M.AIR_BAUD_2400:
 							boot.selects["WirelessRate"].SetText("2400")
-						case E31.AIR_BAUD_4800:
+						case M.AIR_BAUD_4800:
 							boot.selects["WirelessRate"].SetText("4800")
-						case E31.AIR_BAUD_9600:
+						case M.AIR_BAUD_9600:
 							boot.selects["WirelessRate"].SetText("9600")
-						case E31.AIR_BAUD_19200:
+						case M.AIR_BAUD_19200:
 							boot.selects["WirelessRate"].SetText("19200")
-						case E31.AIR_BAUD_38400:
-							boot.selects["WirelessRate"].SetText("38400")
-						case E31.AIR_BAUD_50000:
-							boot.selects["WirelessRate"].SetText("50000")
-						case E31.AIR_BAUD_70000:
-							boot.selects["WirelessRate"].SetText("70000")
+						case M.AIR_BAUD_19200_2:
+							boot.selects["WirelessRate"].SetText("19200_2")
+						case M.AIR_BAUD_19200_3:
+							boot.selects["WirelessRate"].SetText("19200_3")
 						default:
 							Throw("Unknown WirelessRate value!")
 						}
-						switch args[E31.REGISTER_OPTION[0]] & E31.MASK_POWER {
-						case E31.POWER_DBM_33:
+						switch args[M.REGISTER_OPTION[0]] & M.MASK_POWER {
+						case M.POWER_DBM_33:
 							boot.selects["Power"].SetText("33")
-						case E31.POWER_DBM_30:
+						case M.POWER_DBM_30:
 							boot.selects["Power"].SetText("30")
-						case E31.POWER_DBM_27:
+						case M.POWER_DBM_27:
 							boot.selects["Power"].SetText("27")
-						case E31.POWER_DBM_24:
+						case M.POWER_DBM_24:
 							boot.selects["Power"].SetText("24")
 						default:
 							Throw("Unknown Power value!")
 						}
-						boot.selects["Channel"].SetText(fmt.Sprintf("%.1f",
-							(float64(args[E31.REGISTER_CHAN[0]] & E31.MASK_CHANNEL) / float64(10.0)) + float64(425.0) ))
-						switch args[E31.REGISTER_OPTION[0]] & E31.MASK_FEC {
-						case E31.FEC_ENABLE:
+						boot.selects["Channel"].SetText(fmt.Sprintf("%d",
+							int(args[M.REGISTER_CHAN[0]] & M.MASK_CHANNEL) + 410))
+						switch args[M.REGISTER_OPTION[0]] & M.MASK_FEC {
+						case M.FEC_ENABLE:
 							boot.checks["FEC"].SetChecked(true)
-						case E31.FEC_DISABLE:
+						case M.FEC_DISABLE:
 							boot.checks["FEC"].SetChecked(false)
 						default:
 							Throw("Unknown FEC value!")
 						}
-						switch args[E31.REGISTER_OPTION[0]] & E31.MASK_TRANSMISSION_MODE {
-						case E31.TRANSMISSION_MODE_FIXED:
+						switch args[M.REGISTER_OPTION[0]] & M.MASK_TRANSMISSION_MODE {
+						case M.TRANSMISSION_MODE_FIXED:
 							boot.selects["TransmissionMode"].SetText("Fixed point")
-						case E31.TRANSMISSION_MODE_TRANSPARENT:
+						case M.TRANSMISSION_MODE_TRANSPARENT:
 							boot.selects["TransmissionMode"].SetText("Transparent")
 						default:
 							Throw("Unknown TransmissionMode value!")
 						}
-						switch args[E31.REGISTER_OPTION[0]] & E31.MASK_DRIVE_MODE {
-						case E31.DRIVE_MODE_PUSH_PULL:
+						switch args[M.REGISTER_OPTION[0]] & M.MASK_DRIVE_MODE {
+						case M.DRIVE_MODE_PUSH_PULL:
 							boot.selects["DriveMode"].SetText("Push/pull")
-						case E31.DRIVE_MODE_OPEN:
+						case M.DRIVE_MODE_OPEN:
 							boot.selects["DriveMode"].SetText("Open collector")
 						default:
 							Throw("Unknown DriveMode value!")
 						}
-						switch args[E31.REGISTER_OPTION[0]] & E31.MASK_WAKE_UP {
-						case E31.WAKE_UP_MS_250:
+						switch args[M.REGISTER_OPTION[0]] & M.MASK_WAKE_UP {
+						case M.WAKE_UP_MS_250:
 							boot.selects["WakeUpTime"].SetText("250")
-						case E31.WAKE_UP_MS_500:
+						case M.WAKE_UP_MS_500:
 							boot.selects["WakeUpTime"].SetText("500")
-						case E31.WAKE_UP_MS_750:
+						case M.WAKE_UP_MS_750:
 							boot.selects["WakeUpTime"].SetText("750")
-						case E31.WAKE_UP_MS_1000:
+						case M.WAKE_UP_MS_1000:
 							boot.selects["WakeUpTime"].SetText("1000")
-						case E31.WAKE_UP_MS_1250:
+						case M.WAKE_UP_MS_1250:
 							boot.selects["WakeUpTime"].SetText("1250")
-						case E31.WAKE_UP_MS_1500:
+						case M.WAKE_UP_MS_1500:
 							boot.selects["WakeUpTime"].SetText("1500")
-						case E31.WAKE_UP_MS_1750:
+						case M.WAKE_UP_MS_1750:
 							boot.selects["WakeUpTime"].SetText("1750")
-						case E31.WAKE_UP_MS_2000:
+						case M.WAKE_UP_MS_2000:
 							boot.selects["WakeUpTime"].SetText("2000")
 						default:
 							Throw("Unknown WakeUpTime value!")
@@ -278,115 +278,115 @@ func NewBTLP() *BTLP {
 					boot.DisableButtons()
 					boot.SetState("Port " + dev + " opened")
 					args := [6]byte{}
-					args[E31.REGISTER_ADDH[0]] = s2b(boot.entries["ADDH"].Text)
-					args[E31.REGISTER_ADDL[0]] = s2b(boot.entries["ADDL"].Text)
+					args[M.REGISTER_ADDH[0]] = s2b(boot.entries["ADDH"].Text)
+					args[M.REGISTER_ADDL[0]] = s2b(boot.entries["ADDL"].Text)
 					switch boot.selects["UARTRate"].Text {
 					case "1200":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_1200
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_1200
 					case "2400":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_2400
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_2400
 					case "4800":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_4800
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_4800
 					case "9600":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_9600
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_9600
 					case "19200":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_19200
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_19200
 					case "38400":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_38400
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_38400
 					case "57600":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_57600
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_57600
 					case "115200":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_BAUD_115200
+						args[M.REGISTER_SPED[0]] |= M.UART_BAUD_115200
 					default:
 						Throw("Unknown UARTRate value!")
 					}
 					switch boot.selects["UARTParityBit"].Text {
 					case "8N1":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_8N1
+						args[M.REGISTER_SPED[0]] |= M.UART_8N1
 					case "8O1":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_8O1
+						args[M.REGISTER_SPED[0]] |= M.UART_8O1
 					case "8E1":
-						args[E31.REGISTER_SPED[0]] |= E31.UART_8E1
+						args[M.REGISTER_SPED[0]] |= M.UART_8E1
 					default:
 						Throw("Unknown UARTParityBit value!")
 					}
 					switch boot.selects["WirelessRate"].Text {
+					case "300":
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_300
 					case "1200":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_1200
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_1200
 					case "2400":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_2400
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_2400
 					case "4800":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_4800
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_4800
 					case "9600":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_9600
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_9600
 					case "19200":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_19200
-					case "38400":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_38400
-					case "50000":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_50000
-					case "70000":
-						args[E31.REGISTER_SPED[0]] |= E31.AIR_BAUD_70000
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_19200
+					case "19200_2":
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_19200_2
+					case "19200_3":
+						args[M.REGISTER_SPED[0]] |= M.AIR_BAUD_19200_3
 					default:
 						Throw("Unknown WirelessRate value!")
 					}
 					switch boot.selects["DriveMode"].Text {
 					case "Push/pull":
-						args[E31.REGISTER_OPTION[0]] |= E31.DRIVE_MODE_PUSH_PULL
+						args[M.REGISTER_OPTION[0]] |= M.DRIVE_MODE_PUSH_PULL
 					case "Open collector":
-						args[E31.REGISTER_OPTION[0]] |= E31.DRIVE_MODE_OPEN
+						args[M.REGISTER_OPTION[0]] |= M.DRIVE_MODE_OPEN
 					default:
 						Throw("Unknown DriveMode value!")
 					}
 					if boot.checks["FEC"].Checked {
-						args[E31.REGISTER_OPTION[0]] |= E31.FEC_ENABLE
+						args[M.REGISTER_OPTION[0]] |= M.FEC_ENABLE
 					}
 					switch boot.selects["Power"].Text {
 					case "33":
-						args[E31.REGISTER_OPTION[0]] |= E31.POWER_DBM_33
+						args[M.REGISTER_OPTION[0]] |= M.POWER_DBM_33
 					case "30":
-						args[E31.REGISTER_OPTION[0]] |= E31.POWER_DBM_30
+						args[M.REGISTER_OPTION[0]] |= M.POWER_DBM_30
 					case "27":
-						args[E31.REGISTER_OPTION[0]] |= E31.POWER_DBM_27
+						args[M.REGISTER_OPTION[0]] |= M.POWER_DBM_27
 					case "24":
-						args[E31.REGISTER_OPTION[0]] |= E31.POWER_DBM_24
+						args[M.REGISTER_OPTION[0]] |= M.POWER_DBM_24
 					default:
 						Throw("Unknown Power value!")
 					}
-					channel := int((getFloat(boot.selects["Channel"].Text) - float64(425.0)) / float64(10.0))
-					if channel < 0 || channel > 255 {
+					channel := getInt(boot.selects["Channel"].Text) - 410
+					if channel < 0 || channel > 0x1F {
 						Throw("Unknown Channel value!")
 					}
-					args[E31.REGISTER_CHAN[0]] = byte(channel)
+					args[M.REGISTER_CHAN[0]] = byte(channel)
 					switch boot.selects["TransmissionMode"].Text {
 					case "Fixed point":
-						args[E31.REGISTER_OPTION[0]] |= E31.TRANSMISSION_MODE_FIXED
+						args[M.REGISTER_OPTION[0]] |= M.TRANSMISSION_MODE_FIXED
 					case "Transparent":
-						args[E31.REGISTER_OPTION[0]] |= E31.TRANSMISSION_MODE_TRANSPARENT
+						args[M.REGISTER_OPTION[0]] |= M.TRANSMISSION_MODE_TRANSPARENT
 					default:
 						Throw("Unknown TransmissionMode value!")
 					}
 					switch boot.selects["WakeUpTime"].Text {
 					case "250":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_250
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_250
 					case "500":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_500
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_500
 					case "750":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_750
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_750
 					case "1000":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_1000
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_1000
 					case "1250":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_1250
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_1250
 					case "1500":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_1500
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_1500
 					case "1750":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_1750
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_1750
 					case "2000":
-						args[E31.REGISTER_OPTION[0]] |= E31.WAKE_UP_MS_2000
+						args[M.REGISTER_OPTION[0]] |= M.WAKE_UP_MS_2000
 					default:
 						Throw("Unknown WakeUpTime value!")
 					}
-					data, err := Serial.Command(E31.COMMAND_SET_PARAMETERS[:], args[1:])
+					data, err := Serial.Command(M.COMMAND_SET_PARAMETERS[:], args[1:])
 					if err != nil {
 						logError("Writing", err)
 					} else {
@@ -415,7 +415,7 @@ func NewBTLP() *BTLP {
 		    Try: func() {
 					boot.DisableButtons()
 					boot.SetState("Port " + dev + " opened")
-					data, err := Serial.Command(E31.COMMAND_SET_PARAMETERS[:], E31.FACTORY_DEFAULTS[:])
+					data, err := Serial.Command(M.COMMAND_SET_PARAMETERS[:], M.FACTORY_DEFAULTS[:])
 					if err != nil {
 						logError("Writing factory defauls", err)
 					} else {
@@ -609,7 +609,7 @@ func Show(win fyne.Window) fyne.CanvasObject {
 func createGUI() fyne.Window {
 	log.Println("Starting GUI...")
 	a := app.New()
-	w := a.NewWindow("AX5243 E31 Module Configuration Utility")
+	w := a.NewWindow("E32-433T33D Module Configuration Utility")
 	w.SetContent(Show(w))
 	w.Resize(fyne.NewSize(width, 200))
 	return w
