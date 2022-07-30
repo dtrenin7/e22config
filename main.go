@@ -116,7 +116,7 @@ func NewBTLP() *BTLP {
 		b.selectOptions["Device"] = []string{"/dev/tty.usbserial-0001"}
 	}
 	data := []string{}
-	for i := 0; i < 84; i++ {
+	for i := 0; i < 32; i++ {
 		data = append(data, fmt.Sprintf("%d", i + 410))
 	}
 	b.selectOptions["Channel"] = data
@@ -346,7 +346,7 @@ func NewBTLP() *BTLP {
 						Throw("Unknown Power value!")
 					}
 					channel := getInt(boot.selects["Channel"].Text) - 410
-					if channel < 0 || channel > 83 {
+					if channel < 0 || channel > 31 {
 						Throw("Unknown Channel value!")
 					}
 					args[E32.REGISTER_CHAN[0]] = byte(channel)
